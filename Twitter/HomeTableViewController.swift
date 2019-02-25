@@ -20,7 +20,7 @@ class HomeTableViewController: UITableViewController {
     
     @objc func loadTweets(){
         let myURL = "https://api.twitter.com/1.1/statuses/home_timeline.json"
-        let myParams = ["count": 10]
+        let myParams = ["count": 20]
         TwitterAPICaller.client?.getDictionariesRequest(url: myURL, parameters: myParams, success:
             { (tweets: [NSDictionary]) in
             self.tweetArray.removeAll()
@@ -46,6 +46,13 @@ class HomeTableViewController: UITableViewController {
         loadTweets()
         myRefreshControl.addTarget(self, action: #selector(loadTweets), for: .valueChanged)
         tableView.refreshControl = myRefreshControl
+        self.tableView.rowHeight = UITableView.automaticDimension
+        self.tableView.estimatedRowHeight = 150
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated);
+        self.loadTweets();
     }
     // https://api.twitter.com/1.1/statuses/home_timeline.json
     // MARK: - Table view data source
@@ -69,6 +76,9 @@ class HomeTableViewController: UITableViewController {
         if let imageData = data{
             cell.profileImageView.image = UIImage(data: imageData)
         }
+        cell.setFavorite(tweetArray[indexPath.row]["favorited"] as! Bool)
+        cell.tweetID = tweetArray[indexPath.row]["id"] as! Int
+        cell.setRetweeted( tweetArray[indexPath.row]["retweeted"] as! Bool)
         return cell
     }
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
